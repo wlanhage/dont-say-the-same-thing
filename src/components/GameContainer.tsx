@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useGameStore } from "@/utils/gameLogic";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,17 +8,9 @@ import GameControls from "./GameControls";
 import PromptDisplay from "./PromptDisplay";
 import PlayerAnswerView from "./PlayerAnswerView";
 import RevealAnswersView from "./RevealAnswersView";
-import { Sparkles, Trophy, ArrowLeft } from "lucide-react";
-import { Button } from "./ui/button";
-import { useNavigate } from "react-router-dom";
+import { Sparkles, Trophy } from "lucide-react";
 
-interface GameContainerProps {
-  gameCode?: string | null;
-  playerName: string;
-}
-
-const GameContainer = ({ gameCode, playerName }: GameContainerProps) => {
-  const navigate = useNavigate();
+const GameContainer = () => {
   const {
     players,
     addPlayer,
@@ -30,13 +23,6 @@ const GameContainer = ({ gameCode, playerName }: GameContainerProps) => {
   } = useGameStore();
 
   const [winner, setWinner] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Add the current player to the game if playerName is provided
-    if (playerName && players.length === 0) {
-      addPlayer(playerName);
-    }
-  }, [playerName, addPlayer, players.length]);
 
   useEffect(() => {
     // Check if there's only one non-eliminated player left
@@ -132,10 +118,6 @@ const GameContainer = ({ gameCode, playerName }: GameContainerProps) => {
     );
   };
 
-  const handleGoToHome = () => {
-    navigate("/");
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
       <motion.div
@@ -144,26 +126,11 @@ const GameContainer = ({ gameCode, playerName }: GameContainerProps) => {
         transition={{ duration: 0.5 }}
         className="text-center mb-8"
       >
-        <Button 
-          variant="ghost" 
-          onClick={handleGoToHome} 
-          className="absolute top-4 left-4"
-        >
-          <ArrowLeft size={16} className="mr-2" /> Home
-        </Button>
-        
         <div className="inline-flex items-center mb-2">
           <Sparkles className="text-primary mr-2" size={24} />
           <h1 className="text-4xl font-bold">Don't Say The Same Thing As Me</h1>
           <Sparkles className="text-primary ml-2" size={24} />
         </div>
-        
-        {gameCode && (
-          <div className="bg-primary/10 text-primary font-mono rounded-md py-1 px-3 inline-block mb-2">
-            Game Code: {gameCode}
-          </div>
-        )}
-        
         <p className="text-muted-foreground max-w-2xl mx-auto">
           One player is randomly selected each round. Everyone must respond to the prompt, but if you give the same answer as the selected player, you're out!
         </p>
