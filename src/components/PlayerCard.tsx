@@ -1,7 +1,7 @@
 
 import { Player } from "../utils/gameLogic";
 import { cn } from "@/lib/utils";
-import { Check, X, User } from "lucide-react";
+import { X, User } from "lucide-react";
 
 interface PlayerCardProps {
   player: Player;
@@ -70,46 +70,7 @@ const PlayerCard = ({
           {player.isSelected && (
             <span className="category-chip">Selected</span>
           )}
-          
-          {player.eliminated && showResults && (
-            <div className="mt-1 flex items-center justify-center text-destructive">
-              <X size={16} className="mr-1" />
-              <span className="text-sm">Eliminated</span>
-            </div>
-          )}
-          
-          {!player.eliminated && showResults && player.answer && (
-            <div className="mt-1 flex items-center justify-center text-emerald-600">
-              <Check size={16} className="mr-1" />
-              <span className="text-sm">Safe</span>
-            </div>
-          )}
-          
-          {showResults && player.answer && (
-            <div className="mt-2 text-sm px-3 py-1 bg-secondary rounded-lg">
-              {player.answer}
-            </div>
-          )}
         </div>
-        
-        {showAnswerInput && !player.eliminated && !player.answer && (
-          <form onSubmit={handleSubmitAnswer} className="w-full mt-2">
-            <input
-              type="text"
-              name="answer"
-              placeholder="Your answer..."
-              className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              autoComplete="off"
-              disabled={player.eliminated}
-            />
-            <button
-              type="submit"
-              className="w-full mt-2 py-1 text-sm primary-button"
-            >
-              Submit
-            </button>
-          </form>
-        )}
       </div>
     </div>
   );

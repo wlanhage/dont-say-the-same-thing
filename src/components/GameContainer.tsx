@@ -6,6 +6,8 @@ import PlayerCard from "./PlayerCard";
 import AddPlayerForm from "./AddPlayerForm";
 import GameControls from "./GameControls";
 import PromptDisplay from "./PromptDisplay";
+import PlayerAnswerView from "./PlayerAnswerView";
+import RevealAnswersView from "./RevealAnswersView";
 import { Sparkles, Trophy } from "lucide-react";
 
 const GameContainer = () => {
@@ -18,7 +20,6 @@ const GameContainer = () => {
     roundNumber,
     currentPrompt,
     categoryName,
-    submitAnswer,
   } = useGameStore();
 
   const [winner, setWinner] = useState<string | null>(null);
@@ -49,8 +50,73 @@ const GameContainer = () => {
     }
   };
 
-  const showAnswerInput = gamePhase === "answering";
-  const showResults = gamePhase === "results";
+  const renderGameContent = () => {
+    if (!gameActive) {
+      return (
+        <>
+          <AddPlayerForm 
+            onAddPlayer={addPlayer} 
+            disabled={gameActive} 
+          />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+            <AnimatePresence>
+              {players.map((player) => (
+                <motion.div
+                  key={player.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <PlayerCard
+                    player={player}
+                    onRemove={removePlayer}
+                    gameActive={gameActive}
+                    showAnswerInput={false}
+                    showResults={false}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </>
+      );
+    }
+
+    if (gamePhase === "answering") {
+      return <PlayerAnswerView />;
+    }
+
+    if (gamePhase === "results") {
+      return <RevealAnswersView />;
+    }
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+        <AnimatePresence>
+          {players.map((player) => (
+            <motion.div
+              key={player.id}
+              layout
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PlayerCard
+                player={player}
+                gameActive={gameActive}
+                showAnswerInput={false}
+                showResults={false}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
@@ -69,13 +135,6 @@ const GameContainer = () => {
           One player is randomly selected each round. Everyone must respond to the prompt, but if you give the same answer as the selected player, you're out!
         </p>
       </motion.div>
-
-      {!gameActive && (
-        <AddPlayerForm 
-          onAddPlayer={addPlayer} 
-          disabled={gameActive} 
-        />
-      )}
 
       <AnimatePresence mode="wait">
         {gameActive && (
@@ -121,7 +180,7 @@ const GameContainer = () => {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
-        {currentPrompt && (
+        {currentPrompt && gamePhase !== "results" && (
           <PromptDisplay
             prompt={currentPrompt}
             category={categoryName}
@@ -131,31 +190,9 @@ const GameContainer = () => {
 
       <GameControls />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-        <AnimatePresence>
-          {players.map((player) => (
-            <motion.div
-              key={player.id}
-              layout
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <PlayerCard
-                player={player}
-                onRemove={!gameActive ? removePlayer : undefined}
-                onSubmitAnswer={submitAnswer}
-                gameActive={gameActive}
-                showAnswerInput={showAnswerInput}
-                showResults={showResults}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {renderGameContent()}
 
-      {players.length === 0 && (
+      {players.length === 0 && !gameActive && (
         <div className="text-center my-12 text-muted-foreground">
           <p>Add players to get started!</p>
         </div>
